@@ -4,41 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tism Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Tism Tracker</h1>
-    <div>
-        <h2>Log your distance</h2>
-        <!-- Form to log distance -->
-        <form hx-post="/log" hx-target="#progress-section" hx-swap="innerHTML">
-            <label for="name">Name:</label>
-            <select name="name" id="name">
-                <option value="Cadey">Cadey</option>
-                <option value="Gemma">Gemma</option>
-            </select>
-        
-            <label for="distance">Distance:</label>
-            <input type="text" name="distance" id="distance" required>
-        
-            <label for="unit">Unit:</label>
-            <select name="unit" id="unit">
-                <option value="miles">Miles</option>
-                <option value="kilometers">Kilometers</option>
-            </select>
-            <label for="activity">Activity:</label>
-            <select name="activity" id="activity">
-                <option value="walk">Walk</option>
-                <option value="run">Run</option>
-            </select>
-        
-            <button type="submit">Log Distance</button>
-        </form>
+    <div class="container">
+        <h1 class="center-align">Tism Tracker</h1>
+        <div class="row">
+            <h2>Log your distance</h2>
+            <!-- Form to log distance -->
+            <form class="col s12" hx-post="/log" hx-target="#progress-section" hx-swap="innerHTML">
+                <div class="row">
+                    <div class="input-field col s6">
+                        <select name="name" id="name">
+                            <option value="Cadey">Cadey</option>
+                            <option value="Gemma">Gemma</option>
+                        </select>
+                        <label for="name">Name</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input type="text" name="distance" id="distance" required>
+                        <label for="distance">Distance</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <select name="unit" id="unit">
+                            <option value="miles">Miles</option>
+                            <option value="kilometers">Kilometers</option>
+                        </select>
+                        <label for="unit">Unit</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <select name="activity" id="activity">
+                            <option value="walk">Walk</option>
+                            <option value="run">Run</option>
+                        </select>
+                        <label for="activity">Activity</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit">Log Distance</button>
+            </form>
+        </div>
+        <!-- Progress section that updates dynamically -->
+        <div id="progress-section">
+            {{ template "progress.html" . }}
+        </div>
     </div>
-    <!-- Progress section that updates dynamically -->
-    <div id="progress-section">
-        {{ template "progress.html" . }}
-    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('select');
+            var instances = M.FormSelect.init(elems);
+        });
+    </script>
 </body>
 </html>

@@ -6,15 +6,23 @@
     margin-bottom: 15px;
     position: relative;
     display: flex;
+    overflow: hidden; /* Ensure child elements don't overflow */
 }
 .progress {
     height: 100%;
+    display: inline-block;
 }
 .progress-walk {
     background-color: #76c7c0; /* Color for walking */
+    height: 100%;
+    flex: 0 0 auto; /* Prevent flex-grow */
+    margin: 0; /* Remove any margin */
 }
 .progress-run {
     background-color: #ff6347; /* Color for running */
+    height: 100%;
+    flex: 0 0 auto; /* Prevent flex-grow */
+    margin: 0; /* Remove any margin */
 }
 #activity-log {
     max-height: 200px;

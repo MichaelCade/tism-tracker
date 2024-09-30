@@ -1,29 +1,39 @@
-<h2>Progress</h2>
-<div>
-    <h3>Cadey: {{ printf "%.2f" (index . "Cadey").Miles }} miles</h3>
-    <p>Runs: {{ (index . "Cadey").Runs }} | Walks: {{ (index . "Cadey").Walks }}</p>
-    <p>Daily Average Required: {{ printf "%.2f" (index . "Cadey").DailyAvgRequired }} miles/day</p>
-    <div class="progress-bar">
-        <div class="progress progress-walk" style="width: {{ (index . "Cadey").WalkPct }}%"></div>
-        <div class="progress progress-run" style="width: {{ (index . "Cadey").RunPct }}%"></div>
+<h2 class="center-align">Progress</h2>
+<div class="row">
+    <div class="col s12 m6">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Cadey: {{ printf "%.2f" (index . "Cadey").Miles }} miles</span>
+                <p>Runs: {{ (index . "Cadey").Runs }} | Walks: {{ (index . "Cadey").Walks }}</p>
+                <p>Daily Average Required: {{ printf "%.2f" (index . "Cadey").DailyAvgRequired }} miles/day</p>
+                <div class="progress-bar">
+                    <div class="progress progress-walk" style="width: {{ (index . "Cadey").WalkPct }}%"></div>
+                    <div class="progress progress-run" style="width: {{ (index . "Cadey").RunPct }}%"></div>
+                </div>
+                <div id="activity-log" class="card-action">
+                    {{ range (index . "Cadey").ActivityLog }}
+                        <p>{{ . }}</p>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="activity-log">
-        {{ range (index . "Cadey").ActivityLog }}
-            <p>{{ . }}</p>
-        {{ end }}
-    </div>
-</div>
-<div>
-    <h3>Gemma: {{ printf "%.2f" (index . "Gemma").Miles }} miles</h3>
-    <p>Runs: {{ (index . "Gemma").Runs }} | Walks: {{ (index . "Gemma").Walks }}</p>
-    <p>Daily Average Required: {{ printf "%.2f" (index . "Gemma").DailyAvgRequired }} miles/day</p>
-    <div class="progress-bar">
-        <div class="progress progress-walk" style="width: {{ (index . "Gemma").WalkPct }}%"></div>
-        <div class="progress progress-run" style="width: {{ (index . "Gemma").RunPct }}%"></div>
-    </div>
-    <div id="activity-log">
-        {{ range (index . "Gemma").ActivityLog }}
-            <p>{{ . }}</p>
-        {{ end }}
+    <div class="col s12 m6">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Gemma: {{ printf "%.2f" (index . "Gemma").Miles }} miles</span>
+                <p>Runs: {{ (index . "Gemma").Runs }} | Walks: {{ (index . "Gemma").Walks }}</p>
+                <p>Daily Average Required: {{ printf "%.2f" (index . "Gemma").DailyAvgRequired }} miles/day</p>
+                <div class="progress-bar">
+                    <div class="progress progress-walk" style="width: {{ (index . "Gemma").WalkPct }}%"></div>
+                    <div class="progress progress-run" style="width: {{ (index . "Gemma").RunPct }}%"></div>
+                </div>
+                <div id="activity-log" class="card-action">
+                    {{ range (index . "Gemma").ActivityLog }}
+                        <p>{{ . }}</p>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
