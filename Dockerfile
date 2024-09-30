@@ -4,8 +4,8 @@ FROM golang:1.18-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy go.mod and go.sum, install dependencies
-COPY go.mod go.sum ./
+# Copy go.mod, install dependencies
+COPY go.mod ./
 RUN go mod download
 
 # Copy the source code
