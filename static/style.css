@@ -1,11 +1,18 @@
 .progress-bar {
     width: 100%;
+    max-width: 600px; /* Limit the width to fit within the screen */
     background-color: #e0e0e0;
     height: 30px;
     margin-bottom: 15px;
+    position: relative;
+    display: flex;
 }
-
 .progress {
-    background-color: #76c7c0;
     height: 100%;
+}
+.progress-walk {
+    background-color: #76c7c0; /* Color for walking */
+}
+.progress-run {
+    background-color: #ff6347; /* Color for running */
 }

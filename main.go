@@ -11,9 +11,15 @@ import (
 )
 
 type User struct {
-	Name     string
-	Miles    float64
-	Progress float64
+	Name      string
+	Miles     float64
+	Progress  float64
+	Runs      int
+	Walks     int
+	WalkMiles float64
+	RunMiles  float64
+	WalkPct   float64
+	RunPct    float64
 }
 
 var (
@@ -33,9 +39,14 @@ func kmToMiles(km float64) float64 {
 func renderProgressSection(w http.ResponseWriter) error {
 	tmpl, err := template.ParseFiles("templates/progress.html") // separate progress HTML
 	if err != nil {
+		log.Printf("Error loading progress template: %v", err)
 		return err
 	}
-	return tmpl.Execute(w, users)
+	if err := tmpl.Execute(w, users); err != nil {
+		log.Printf("Error rendering progress template: %v", err)
+		return err
+	}
+	return nil
 }
 
 func logDistance(w http.ResponseWriter, r *http.Request) {
@@ -56,9 +67,10 @@ func logDistance(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	distanceStr := r.FormValue("distance")
 	unit := r.FormValue("unit")
+	activity := r.FormValue("activity")
 
 	// Validate form values
-	if name == "" || distanceStr == "" || unit == "" {
+	if name == "" || distanceStr == "" || unit == "" || activity == "" {
 		http.Error(w, "Missing form fields", http.StatusBadRequest)
 		return
 	}
@@ -86,12 +98,21 @@ func logDistance(w http.ResponseWriter, r *http.Request) {
 		distance = kmToMiles(distance) // Convert kilometers to miles
 	}
 
-	// Update user's total miles
+	// Update user's total miles and activity-specific miles
+	if activity == "walk" {
+		user.WalkMiles += distance
+		user.Walks++
+	} else if activity == "run" {
+		user.RunMiles += distance
+		user.Runs++
+	}
 	user.Miles += distance
 	user.Progress = math.Min(100, (user.Miles/mileGoal)*100) // Cap progress at 100%
+	user.WalkPct = math.Min(100, (user.WalkMiles/mileGoal)*100)
+	user.RunPct = math.Min(100, (user.RunMiles/mileGoal)*100)
 
 	// Log the new distance and progress for debugging
-	log.Printf("%s has logged %.2f miles. Total: %.2f miles. Progress: %.2f%%", name, distance, user.Miles, user.Progress)
+	log.Printf("%s has logged %.2f miles (%s). Total: %.2f miles. Progress: %.2f%%", name, distance, activity, user.Miles, user.Progress)
 
 	// Render the updated progress section
 	if err := renderProgressSection(w); err != nil {
@@ -105,12 +126,14 @@ func getProgress(w http.ResponseWriter, r *http.Request) {
 	defer mu.Unlock()
 
 	// Render the full page when accessing the root path
-	tmpl, err := template.ParseFiles("templates/index.html")
+	tmpl, err := template.ParseFiles("templates/index.html", "templates/progress.html")
 	if err != nil {
+		log.Printf("Error loading templates: %v", err)
 		http.Error(w, "Error loading template", http.StatusInternalServerError)
 		return
 	}
 	if err := tmpl.Execute(w, users); err != nil {
+		log.Printf("Error rendering templates: %v", err)
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 	}
 }

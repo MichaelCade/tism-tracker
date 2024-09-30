@@ -1,13 +1,17 @@
 <h2>Progress</h2>
 <div>
     <h3>Cadey: {{ (index . "Cadey").Miles }} miles</h3>
+    <p>Runs: {{ (index . "Cadey").Runs }} | Walks: {{ (index . "Cadey").Walks }}</p>
     <div class="progress-bar">
-        <div class="progress" style="width: {{ (index . "Cadey").Progress }}%"></div>
+        <div class="progress progress-walk" style="width: {{ (index . "Cadey").WalkPct }}%"></div>
+        <div class="progress progress-run" style="width: {{ (index . "Cadey").RunPct }}%"></div>
     </div>
 </div>
 <div>
     <h3>Gemma: {{ (index . "Gemma").Miles }} miles</h3>
+    <p>Runs: {{ (index . "Gemma").Runs }} | Walks: {{ (index . "Gemma").Walks }}</p>
     <div class="progress-bar">
-        <div class="progress" style="width: {{ (index . "Gemma").Progress }}%"></div>
+        <div class="progress progress-walk" style="width: {{ (index . "Gemma").WalkPct }}%"></div>
+        <div class="progress progress-run" style="width: {{ (index . "Gemma").RunPct }}%"></div>
     </div>
 </div>
