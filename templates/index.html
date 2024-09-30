@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tism Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            height: 25px;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tism Tracker</h1>
+
+    <div>
+        <h2>Log your distance</h2>
+        <!-- Form to log distance -->
+        <form hx-post="/log" hx-target="#progress-section" hx-swap="innerHTML">
+            <label for="name">Name:</label>
+            <select name="name" id="name">
+                <option value="Cadey">Cadey</option>
+                <option value="Gemma">Gemma</option>
+            </select>
+        
+            <label for="distance">Distance:</label>
+            <input type="text" name="distance" id="distance" required>
+        
+            <label for="unit">Unit:</label>
+            <select name="unit" id="unit">
+                <option value="miles">Miles</option>
+                <option value="kilometers">Kilometers</option>
+            </select>
+        
+            <button type="submit">Log Distance</button>
+        </form>
+    </div>
+
+    <!-- Progress section that updates dynamically -->
+    <div id="progress-section">
+        <h2>Progress</h2>
+        <div>
+            <h3>Cadey: {{ (index . "Cadey").Miles }} miles</h3>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ (index . "Cadey").Progress }}%"></div>
+            </div>
+        </div>
+        <div>
+            <h3>Gemma: {{ (index . "Gemma").Miles }} miles</h3>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ (index . "Gemma").Progress }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+</body>
+</html>
