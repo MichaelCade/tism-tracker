@@ -1,6 +1,49 @@
+body {
+    background-color: #f5f5f5; /* Light grey background */
+    color: #333; /* Dark text color */
+    font-family: 'Roboto', sans-serif; /* Use a modern font */
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin-top: 20px;
+    max-width: 1200px; /* Limit the container width */
+    padding: 0 15px; /* Add padding to the sides */
+}
+
+h1 {
+    color: #7500A1; /* Primary purple color */
+    font-size: 2.5rem; /* Scale down the main heading */
+}
+
+h2 {
+    color: #7500A1; /* Primary purple color */
+    font-size: 1.5rem; /* Scale down the subheadings */
+}
+
+.card {
+    background-color: #ffffff; /* White background for cards */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* Add space between cards */
+}
+
+.card-title {
+    color: #7500A1; /* Primary purple color for card titles */
+}
+
+.btn {
+    background-color: #34D8CE; /* Teal button color */
+    color: #ffffff; /* White text color */
+}
+
+.btn:hover {
+    background-color: #2bb3a8; /* Darker teal on hover */
+}
+
 .progress-bar {
     width: 100%;
-    max-width: 600px; /* Limit the width to fit within the screen */
     background-color: #e0e0e0;
     height: 30px;
     margin-bottom: 15px;
@@ -8,22 +51,26 @@
     display: flex;
     overflow: hidden; /* Ensure child elements don't overflow */
 }
+
 .progress {
     height: 100%;
     display: inline-block;
 }
+
 .progress-walk {
-    background-color: #76c7c0; /* Color for walking */
+    background-color: #FDC722; /* Yellow color for walking */
     height: 100%;
     flex: 0 0 auto; /* Prevent flex-grow */
     margin: 0; /* Remove any margin */
 }
+
 .progress-run {
-    background-color: #ff6347; /* Color for running */
+    background-color: #E3008C; /* Pink color for running */
     height: 100%;
     flex: 0 0 auto; /* Prevent flex-grow */
     margin: 0; /* Remove any margin */
 }
+
 #activity-log {
     max-height: 200px;
     overflow-y: auto;
@@ -31,8 +78,29 @@
     padding: 10px;
     margin-top: 20px;
 }
+
 #activity-log p {
     margin: 0;
     padding: 5px 0;
     border-bottom: 1px solid #eee;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .progress-bar {
+        height: 25px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }
