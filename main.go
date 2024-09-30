@@ -8,18 +8,21 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type User struct {
-	Name      string
-	Miles     float64
-	Progress  float64
-	Runs      int
-	Walks     int
-	WalkMiles float64
-	RunMiles  float64
-	WalkPct   float64
-	RunPct    float64
+	Name             string
+	Miles            float64
+	Progress         float64
+	Runs             int
+	Walks            int
+	WalkMiles        float64
+	RunMiles         float64
+	WalkPct          float64
+	RunPct           float64
+	DailyAvgRequired float64
+	ActivityLog      []string
 }
 
 var (
@@ -35,12 +38,36 @@ func kmToMiles(km float64) float64 {
 	return km * 0.621371
 }
 
+// Function to calculate the daily average distance needed for the remaining days of October
+func calculateDailyAverage(user *User) {
+	currentDate := time.Now()
+	// Set the month to October
+	october := time.Date(currentDate.Year(), time.October, 1, 0, 0, 0, 0, currentDate.Location())
+	endOfMonth := time.Date(october.Year(), october.Month()+1, 0, 0, 0, 0, 0, october.Location())
+	var daysRemaining int
+	if currentDate.Month() == time.September {
+		daysRemaining = endOfMonth.Day() // All days in October
+	} else if currentDate.Month() == time.October {
+		daysRemaining = endOfMonth.Day() - currentDate.Day()
+	} else {
+		daysRemaining = 0
+	}
+	if daysRemaining > 0 {
+		user.DailyAvgRequired = (mileGoal - user.Miles) / float64(daysRemaining)
+	} else {
+		user.DailyAvgRequired = 0
+	}
+}
+
 // Function to render only the progress section
 func renderProgressSection(w http.ResponseWriter) error {
 	tmpl, err := template.ParseFiles("templates/progress.html") // separate progress HTML
 	if err != nil {
 		log.Printf("Error loading progress template: %v", err)
 		return err
+	}
+	for _, user := range users {
+		calculateDailyAverage(user)
 	}
 	if err := tmpl.Execute(w, users); err != nil {
 		log.Printf("Error rendering progress template: %v", err)
@@ -114,6 +141,9 @@ func logDistance(w http.ResponseWriter, r *http.Request) {
 	// Log the new distance and progress for debugging
 	log.Printf("%s has logged %.2f miles (%s). Total: %.2f miles. Progress: %.2f%%", name, distance, activity, user.Miles, user.Progress)
 
+	// Add the activity log entry with the current date and time
+	user.ActivityLog = append(user.ActivityLog, fmt.Sprintf("%s: %.2f miles (%s)", time.Now().Format("2006-01-02 15:04:05"), distance, activity))
+
 	// Render the updated progress section
 	if err := renderProgressSection(w); err != nil {
 		http.Error(w, "Error rendering progress", http.StatusInternalServerError)
@@ -131,6 +161,9 @@ func getProgress(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error loading templates: %v", err)
 		http.Error(w, "Error loading template", http.StatusInternalServerError)
 		return
+	}
+	for _, user := range users {
+		calculateDailyAverage(user)
 	}
 	if err := tmpl.Execute(w, users); err != nil {
 		log.Printf("Error rendering templates: %v", err)

@@ -16,3 +16,15 @@
 .progress-run {
     background-color: #ff6347; /* Color for running */
 }
+#activity-log {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+}
+#activity-log p {
+    margin: 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
