@@ -21,7 +21,7 @@
         <div class="row">
             <h2>Log your distance</h2>
             <!-- Form to log distance -->
-            <form class="col s12" hx-post="/log" hx-target="#progress-section" hx-swap="innerHTML">
+            <form class="col s12" hx-post="/log" hx-target="#progress-section" hx-swap="outerHTML">
                 <div class="row">
                     <div class="input-field col s6">
                         <select name="name" id="name">
