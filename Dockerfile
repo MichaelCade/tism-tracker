@@ -19,6 +19,6 @@ COPY --from=build /app/tism-tracker /tism-tracker
 COPY --from=build /app/templates /templates
 COPY --from=build /app/static /static
 # Expose the port
-EXPOSE 8080
+EXPOSE 8181
 # Run the application
 CMD ["/tism-tracker"]

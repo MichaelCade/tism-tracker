@@ -1,0 +1,57 @@
+<h2 class="center-align">Progress</h2>
+<div class="row">
+    {{ range $name, $user := . }}
+    <div class="col s12">
+        <div class="card blue lighten-5">
+            <div class="card-content">
+                <div class="row">
+                    <div class="col s12 m6">
+                        <span class="card-title">{{ $name }}: {{ printf "%.2f" $user.Kilometers }} / {{ printf "%.1f" $user.KilometersGoal }} km</span>
+                        <p>Sessions: {{ $user.Sessions }} | Total Time: {{ printf "%.1f" $user.SessionsDuration }} minutes</p>
+                        <p>Days Remaining: {{ $user.DaysRemaining }} | Daily Target: {{ printf "%.2f" $user.DailyAvgRequired }} km/day</p>
+                        <div class="progress-container">
+                            <div class="progress">
+                                <div class="determinate blue" style="width: {{ printf "%.1f" $user.ProgressPct }}%;"></div>
+                            </div>
+                            <div class="progress-label">{{ printf "%.1f" $user.ProgressPct }}% Complete</div>
+                        </div>
+                        
+                        <div class="activity-log-container">
+                            <h5>Recent Sessions</h5>
+                            <ul class="collection">
+                                {{ range $index, $activity := $user.ActivityLog }}
+                                    {{ if lt $index 5 }}
+                                        <li class="collection-item">{{ $activity }}</li>
+                                    {{ end }}
+                                {{ end }}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col s12 m6">
+                        <div class="chart-container" style="position: relative; height:200px; width:100%">
+                            <canvas id="progressChart" 
+                                data-completed="{{ printf "%.2f" $user.Kilometers }}"
+                                data-remaining="{{ printf "%.2f" (sub $user.KilometersGoal $user.Kilometers) }}"></canvas>
+                        </div>
+                        
+                        <!-- Extract dates and distances for the line chart -->
+                        {{ $dates := extractDates $user.ActivityLog }}
+                        {{ $distances := extractDistances $user.ActivityLog }}
+                        
+                        <div class="chart-container" style="position: relative; height:200px; width:100%; margin-top: 20px;">
+                            <canvas id="sessionsChart"
+                                data-dates='{{ $dates }}'
+                                data-distances='{{ $distances }}'></canvas>
+                        </div>
+                        
+                        <div class="chart-details">
+                            <p>Total distance: {{ printf "%.2f" $user.Kilometers }} km</p>
+                            <p>Remaining: {{ printf "%.2f" (sub $user.KilometersGoal $user.Kilometers) }} km</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</div>
