@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rowing Tracker - 100km Challenge June 2025</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+        <div class="row">
+            <div class="col s12">
+                <div class="nav-wrapper">
+                    <a href="/" class="btn waves-effect waves-light" style="margin-top: 10px;">Walk/Run Challenge</a>
+                    <a href="/rowing" class="btn waves-effect waves-light blue" style="margin-top: 10px;">Rowing Challenge</a>
+                    <a href="https://www.bcrt.org.uk/get-involved/events-and-challenges/row-100km-in-june" target="_blank">
+                        <img src="/static/bcrt.png" alt="Bone Cancer Research Logo" style="height: 100px; margin-top: 10px; margin-left: 10px;">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <h1 class="center-align">Rowing Tracker</h1>
+        <h3 class="center-align">100km Challenge for Bone Cancer Research - June 2025</h3>
+        
+        <div class="row">
+            <h2>Log your rowing session</h2>
+            <!-- Form to log rowing distance -->
+            <form class="col s12" hx-post="/log-rowing" hx-target="#rowing-progress-section" hx-swap="outerHTML">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <select name="name" id="name">
+                            <option value="Michael">Michael</option>
+                        </select>
+                        <label for="name">Name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input type="number" step="0.01" name="distance" id="distance" required>
+                        <label for="distance">Distance (kilometers)</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input type="number" step="0.1" name="duration" id="duration" required>
+                        <label for="duration">Duration (minutes)</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light blue" type="submit">Log Rowing Session</button>
+            </form>
+        </div>
+        
+        <!-- Progress section that updates dynamically -->
+        <div id="rowing-progress-section">
+            {{ template "rowing_progress.html" . }}
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('select');
+            var instances = M.FormSelect.init(elems);
+            
+            // Initialize charts if data is available
+            initializeCharts();
+        });
+        
+        // Global variables to store chart instances
+        var progressChartInstance = null;
+        var sessionsChartInstance = null;
+        
+        function initializeCharts() {
+    const progressChart = document.getElementById('progressChart');
+    if (progressChart) {
+        // Destroy previous chart instance if it exists
+        if (progressChartInstance) {
+            progressChartInstance.destroy();
+        }
+        
+        // Parse the data attributes with proper error handling
+        let completed = 0;
+        let remaining = 0;
+        
+        try {
+            completed = parseFloat(progressChart.getAttribute('data-completed'));
+            completed = isNaN(completed) ? 0 : completed;
+            
+            remaining = parseFloat(progressChart.getAttribute('data-remaining'));
+            remaining = isNaN(remaining) ? 100 : remaining;
+        } catch (e) {
+            console.error("Error parsing chart data:", e);
+        }
+        
+        // Debug log to help diagnose issues
+        console.log("Chart data - completed:", completed, "km, remaining:", remaining, "km");
+        
+        // Create new chart instance
+        progressChartInstance = new Chart(progressChart, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Remaining'],
+                datasets: [{
+                    data: [completed, remaining],
+                    backgroundColor: ['#2196F3', '#e0e0e0']
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                return `${label}: ${value.toFixed(2)} km`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    const sessionsChart = document.getElementById('sessionsChart');
+    if (sessionsChart) {
+        // Destroy previous chart instance if it exists
+        if (sessionsChartInstance) {
+            sessionsChartInstance.destroy();
+        }
+        
+        try {
+            // Get dates from the existing data attribute for consistency
+            let dates = [];
+            try {
+                const datesString = sessionsChart.getAttribute('data-dates');
+                dates = datesString ? JSON.parse(datesString) : [];
+            } catch (e) {
+                console.error("Error parsing dates:", e);
+                dates = [];
+            }
+            
+            // Extract distances directly from the Recent Sessions list
+            let distances = [];
+            const sessionItems = document.querySelectorAll('.activity-log-container .collection-item');
+            
+            sessionItems.forEach(item => {
+                const text = item.textContent;
+                const kmMatch = text.match(/(\d+\.\d+) km/);
+                if (kmMatch && kmMatch[1]) {
+                    const distance = parseFloat(kmMatch[1]);
+                    if (!isNaN(distance)) {
+                        distances.unshift(distance); // Add to beginning to match date order
+                    }
+                }
+            });
+            
+            // Make sure we have the same number of dates and distances
+            while (distances.length > dates.length) {
+                dates.unshift(''); // Add empty dates if needed
+            }
+            
+            // Trim arrays to match
+            const minLength = Math.min(dates.length, distances.length);
+            dates = dates.slice(0, minLength);
+            distances = distances.slice(0, minLength);
+            
+            // Debug log to help diagnose issues
+            console.log("Sessions chart data from DOM - dates:", dates, "distances:", distances);
+            
+            // Create new chart instance
+            sessionsChartInstance = new Chart(sessionsChart, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Distance (km)',
+                        data: distances,
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Distance (km)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("Error initializing sessions chart:", e);
+        }
+    }
+}
+        
+        // Re-initialize charts when htmx content is loaded
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            console.log("Content swapped, reinitializing charts");
+            // Wait a brief moment to ensure DOM is fully updated
+            setTimeout(initializeCharts, 50);
+        });
+    </script>
+</body>
+</html>

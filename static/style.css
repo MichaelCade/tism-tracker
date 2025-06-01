@@ -71,6 +71,37 @@ h2 {
     margin: 0; /* Remove any margin */
 }
 
+/* Rowing specific styles */
+.blue-theme .card-title {
+    color: #2196F3; /* Blue color for rowing */
+}
+
+.progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    height: 20px;
+    margin: 15px 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.determinate {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.progress-label {
+    text-align: center;
+    margin-top: -5px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.chart-container {
+    margin: 20px 0;
+    height: 250px;
+}
+
 #activity-log {
     max-height: 200px;
     overflow-y: auto;
