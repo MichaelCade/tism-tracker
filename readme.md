@@ -98,9 +98,40 @@ To build and push the Docker image for multiple platforms:
 
 - DATABASE_URL: The connection string for the PostgreSQL database.
 
-Example:
+Example format:
 
-   export DATABASE_URL="postgres://username:password@host:port/dbname?sslmode=disable"
+```sh
+export DATABASE_URL="postgres://username:password@host:port/dbname?sslmode=disable"
+```
+
+### Quick Start with run.sh
+
+For convenience, a `run.sh` script is provided that helps you set up the database connection:
+
+```sh
+./run.sh
+```
+
+This script will:
+
+1. Check if DATABASE_URL is set
+2. Allow you to enter database credentials if not set
+3. Check if PostgreSQL is running
+4. Start the application
+
+### Troubleshooting Connection Issues
+
+If you see an error like "missing '=' after 'cd' in connection info string", check that your connection string follows the correct format:
+
+```sh
+postgres://username:password@host:port/dbname?sslmode=disable
+```
+
+Common issues:
+
+- Make sure you're using a colon `:` between username and password, not `cd`
+- Make sure you're using the `postgres://` protocol prefix
+- Check that all parameters are properly separated with `&`
 
 ## Database Setup
 
@@ -110,10 +141,18 @@ Example:
 
 Example:
 
-   psql -U postgres
-   CREATE DATABASE tism_tracker;
-   CREATE USER tism_user WITH ENCRYPTED PASSWORD 'yourpassword';
-   GRANT ALL PRIVILEGES ON DATABASE tism_tracker TO tism_user;
+```sql
+psql -U postgres
+CREATE DATABASE tism_tracker;
+CREATE USER tism_user WITH ENCRYPTED PASSWORD 'yourpassword';
+GRANT ALL PRIVILEGES ON DATABASE tism_tracker TO tism_user;
+```
+
+Then set your connection string:
+
+```sh
+export DATABASE_URL="postgres://tism_user:yourpassword@localhost:5432/tism_tracker?sslmode=disable"
+```
 
 ## Contributing
 

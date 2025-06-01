@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Training Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <div class="nav-wrapper">
+                <a href="/" class="btn waves-effect waves-light" style="margin-top: 10px;">Walk/Run Challenge</a>
+                <a href="/rowing" class="btn waves-effect waves-light blue" style="margin-top: 10px;">Rowing Challenge</a>
+                <a href="/weight-training?type=push" class="btn waves-effect waves-light green" style="margin-top: 10px;">Push Workout</a>
+                <a href="/weight-training?type=pull" class="btn waves-effect waves-light orange" style="margin-top: 10px;">Pull Workout</a>
+                <a href="/weight-training?type=legs" class="btn waves-effect waves-light red" style="margin-top: 10px;">Legs Workout</a>
+            </div>
+        </div>
+    </div>
+    
+    <h1 class="center-align">Weight Training Tracker</h1>
+    <h3 class="center-align">{{.TrainingType}} Workout</h3>
+    
+    <div class="row">
+        <h2>Log your {{.TrainingType}} workout</h2>
+        <!-- Form to log weight training -->
+        <form class="col s12" id="workout-form" hx-post="/log-weight-training" hx-target="#weight-training-progress-section" hx-swap="outerHTML">
+            <div class="row">
+                <div class="input-field col s12">
+                    <select name="name" id="name">
+                        {{range .Users}}
+                        <option value="{{.Name}}">{{.Name}}</option>
+                        {{end}}
+                    </select>
+                    <label for="name">Name</label>
+                </div>
+            </div>
+            
+            <!-- Hidden field for training type -->
+            <input type="hidden" name="training_type" value="{{.TrainingType}}">
+            
+            <!-- Fixed number of reps information -->
+            <div class="row">
+                <div class="col s12">
+                    <h5>Each set is 8 reps</h5>
+                    <p>Select an exercise and enter weights (kg) for each set</p>
+                </div>
+            </div>
+            
+            <!-- Exercise Table with Weight Inputs -->
+            <div class="row">
+                <div class="col s12">
+                    <table class="striped highlight">
+                        <thead>
+                            <tr>
+                                <th>Exercise</th>
+                                <th>Set 1 (kg)</th>
+                                <th>Set 2 (kg)</th>
+                                <th>Set 3 (kg)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range index .Exercises .TrainingType}}
+                            <tr class="exercise-row" data-exercise="{{.}}">
+                                <td>{{.}}</td>
+                                <td>
+                                    <input type="number" step="0.5" class="set1-weight" placeholder="0.0">
+                                </td>
+                                <td>
+                                    <input type="number" step="0.5" class="set2-weight" placeholder="0.0">
+                                </td>
+                                <td>
+                                    <input type="number" step="0.5" class="set3-weight" placeholder="0.0">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn waves-effect waves-light green log-exercise-btn">Log</button>
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Hidden fields for sets that will be populated by JS -->
+            <input type="hidden" name="exercise_name" id="selected_exercise" />
+            <input type="hidden" name="set1_weight" id="set1_weight" />
+            <input type="hidden" name="set2_weight" id="set2_weight" />
+            <input type="hidden" name="set3_weight" id="set3_weight" />
+        </form>
+    </div>
+    
+    <!-- Progress Section -->
+    <div id="weight-training-progress-section">
+        {{template "weight_training_progress.html" .}}
+    </div>
+    
+    <!-- JavaScript for Materialize components -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize select elements
+            var selectElems = document.querySelectorAll('select');
+            M.FormSelect.init(selectElems);
+            
+            // Initialize collapsible elements
+            var collapsibleElems = document.querySelectorAll('.collapsible');
+            M.Collapsible.init(collapsibleElems);
+            
+            // Add click handlers for the Log buttons
+            document.querySelectorAll('.log-exercise-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var row = this.closest('.exercise-row');
+                    var exercise = row.getAttribute('data-exercise');
+                    var set1Weight = row.querySelector('.set1-weight').value;
+                    var set2Weight = row.querySelector('.set2-weight').value;
+                    var set3Weight = row.querySelector('.set3-weight').value;
+                    
+                    // Validate inputs
+                    if (!set1Weight || !set2Weight || !set3Weight) {
+                        M.toast({html: 'Please enter weights for all three sets', classes: 'red'});
+                        return;
+                    }
+                    
+                    // Set the hidden field values
+                    document.getElementById('selected_exercise').value = exercise;
+                    document.getElementById('set1_weight').value = set1Weight;
+                    document.getElementById('set2_weight').value = set2Weight;
+                    document.getElementById('set3_weight').value = set3Weight;
+                    
+                    // Submit the form
+                    document.getElementById('workout-form').submit();
+                });
+            });
+        });
+    </script>
+</div>
+</body>
+</html>
