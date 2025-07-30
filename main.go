@@ -90,21 +90,21 @@ var (
 func initDB() error {
 	var err error
 	connStr := os.Getenv("DATABASE_URL")
-	
+
 	// Check if connection string is empty
 	if connStr == "" {
 		log.Println("Warning: DATABASE_URL environment variable is not set")
 		connStr = "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
 		log.Printf("Using default connection string: %s", connStr)
 	}
-	
+
 	// Fix common connection string issues
 	// Replace any 'cd' without '=' that might be causing the error
 	if strings.Contains(connStr, " cd ") {
 		connStr = strings.Replace(connStr, " cd ", "=", -1)
 		log.Println("Fixed malformed connection string by replacing 'cd' with '='")
 	}
-	
+
 	// Ensure connection string has proper format
 	if !strings.HasPrefix(connStr, "postgres://") {
 		// If it doesn't have the postgres:// prefix, try to format it properly
@@ -117,7 +117,7 @@ func initDB() error {
 		}
 		log.Printf("Reformatted connection string: %s", connStr)
 	}
-	
+
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Printf("Error opening database connection: %v", err)
@@ -172,7 +172,7 @@ func initDB() error {
 		log.Printf("Error initializing rowing table: %v", err)
 		return err
 	}
-	
+
 	// Initialize weight training tables
 	if err := initWeightTrainingTables(); err != nil {
 		log.Printf("Error initializing weight training tables: %v", err)
@@ -307,19 +307,19 @@ func calculateRowingDailyAverage(user *RowingUser) {
 
 func testDBConnection() {
 	log.Println("Testing database connection...")
-	
+
 	// Check if the database connection is properly initialized
 	if db == nil {
 		log.Fatal("Database connection is nil, initialization failed")
 	}
-	
+
 	// Test the connection with a ping
 	err := db.Ping()
 	if err != nil {
 		log.Fatalf("Error pinging database: %v", err)
 	}
 	log.Println("Successfully connected to the database!")
-	
+
 	// Try to query the users table (a real operation)
 	log.Println("Testing query to users table...")
 	rows, err := db.Query("SELECT id, name FROM users")
@@ -342,11 +342,11 @@ func testDBConnection() {
 	if userCount == 0 {
 		log.Println("No users found in the database, but query executed successfully")
 	}
-	
+
 	if err := rows.Err(); err != nil {
 		log.Fatalf("Error iterating over rows: %v", err)
 	}
-	
+
 	log.Println("Database connection and query tests completed successfully")
 }
 
@@ -990,26 +990,26 @@ func logWeightTrainingExercise(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Invalid training type: %s", trainingType)
 		http.Error(w, "Invalid training type", http.StatusBadRequest)
 		return
-	}	// Get weights for each set (always 8 reps)
+	} // Get weights for each set (always 8 reps)
 	weights := []float64{}
 	reps := []int{8, 8, 8} // Fixed at 8 reps per set
-	
+
 	// Get the selected exercise
-	selectedExercise := r.FormValue("selected_exercise") 
+	selectedExercise := r.FormValue("selected_exercise")
 	if selectedExercise != "" {
 		exerciseName = selectedExercise
 	}
-	
+
 	for i := 1; i <= 3; i++ {
 		weightStr := r.FormValue(fmt.Sprintf("set%d_weight", i))
-		
+
 		weight, err := strconv.ParseFloat(weightStr, 64)
 		if err != nil {
 			log.Printf("Invalid weight value for set %d: %v", i, err)
 			http.Error(w, fmt.Sprintf("Invalid weight value for set %d", i), http.StatusBadRequest)
 			return
 		}
-		
+
 		weights = append(weights, weight)
 	}
 
@@ -1186,7 +1186,7 @@ func getWeightTrainingProgress(w http.ResponseWriter, r *http.Request) {
 			return WeightTrainingType(s)
 		},
 	}
-	
+
 	// Parse and execute the template
 	tmpl, err := template.New("weight_training.html").Funcs(funcMap).ParseFiles("templates/weight_training.html", "templates/weight_training_progress.html")
 	if err != nil {
@@ -1239,7 +1239,7 @@ func renderWeightTrainingProgressSection(w http.ResponseWriter, trainingType str
 			return WeightTrainingType(s)
 		},
 	}
-	
+
 	// Parse and execute the template
 	tmpl, err := template.New("weight_training_progress.html").Funcs(funcMap).ParseFiles("templates/weight_training_progress.html")
 	if err != nil {

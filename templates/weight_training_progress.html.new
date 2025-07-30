@@ -1,0 +1,154 @@
+<!-- Template for rendering the weight training progress section -->
+<div id="weight-training-progress-section">
+    <div class="row">
+        <div class="col s12">
+            <h2>{{.TrainingType}} Workout Progress</h2>
+            
+            <!-- User Statistics -->
+            <div class="row">
+                {{range .Users}}
+                <div class="col s12 m6">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">{{.Name}}'s Statistics</span>
+                            <p>Total Sessions: {{.TotalSessions}}</p>
+                            <p>Push Sessions: {{.PushSessions}}</p>
+                            <p>Pull Sessions: {{.PullSessions}}</p>
+                            <p>Legs Sessions: {{.LegsSessions}}</p>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            
+            <!-- Recent Exercises -->
+            <div class="row">
+                <div class="col s12">
+                    <h3>Recent {{.TrainingType}} Exercises</h3>
+                    
+                    {{range .Users}}
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">{{.Name}}'s {{$.TrainingType}} Workouts</span>
+                            
+                            {{$exercises := index .Exercises (toWeightTrainingType $.TrainingType)}}
+                            {{if $exercises}}
+                                <table class="striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Exercise</th>
+                                            <th>Sets</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range $exercise := $exercises}}
+                                        <tr>
+                                            <td>{{$exercise.Date.Format "Jan 02, 2006"}}</td>
+                                            <td>{{$exercise.Name}}</td>
+                                            <td>
+                                                {{if ge (len $exercise.Sets) 1}}Set 1: {{(index $exercise.Sets 0).Weight}} kg × 8 reps{{end}}
+                                                {{if ge (len $exercise.Sets) 2}}<br>Set 2: {{(index $exercise.Sets 1).Weight}} kg × 8 reps{{end}}
+                                                {{if ge (len $exercise.Sets) 3}}<br>Set 3: {{(index $exercise.Sets 2).Weight}} kg × 8 reps{{end}}
+                                            </td>
+                                        </tr>
+                                        {{end}}
+                                    </tbody>
+                                </table>
+                            {{else}}
+                                <p>No {{$.TrainingType}} exercises logged yet.</p>
+                            {{end}}
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+            
+            <!-- Exercise History By Exercise Name -->
+            <div class="row">
+                <div class="col s12">
+                    <h3>{{.TrainingType}} Exercise History</h3>
+                    
+                    {{range .Users}}
+                        {{$user := .}}
+                        {{$exercises := index .Exercises (toWeightTrainingType $.TrainingType)}}
+                        
+                        {{if $exercises}}
+                            {{$exerciseMap := makeExerciseMap $exercises}}
+                            
+                            <div class="card">
+                                <div class="card-content">
+                                    <span class="card-title">{{$user.Name}}'s Exercise History</span>
+                                    
+                                    <ul class="collapsible">
+                                        {{range $exerciseName, $exerciseHistory := $exerciseMap}}
+                                            <li>
+                                                <div class="collapsible-header">
+                                                    <i class="material-icons">fitness_center</i>
+                                                    {{$exerciseName}} 
+                                                    <span class="badge">{{len $exerciseHistory}} sessions</span>
+                                                </div>
+                                                <div class="collapsible-body">
+                                                    <table class="striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Set 1 (kg)</th>
+                                                                <th>Set 2 (kg)</th>
+                                                                <th>Set 3 (kg)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {{range $ex := $exerciseHistory}}
+                                                                <tr>
+                                                                    <td>{{$ex.Date.Format "Jan 02, 2006"}}</td>
+                                                                    <td>{{if ge (len $ex.Sets) 1}}{{(index $ex.Sets 0).Weight}} kg{{else}}-{{end}}</td>
+                                                                    <td>{{if ge (len $ex.Sets) 2}}{{(index $ex.Sets 1).Weight}} kg{{else}}-{{end}}</td>
+                                                                    <td>{{if ge (len $ex.Sets) 3}}{{(index $ex.Sets 2).Weight}} kg{{else}}-{{end}}</td>
+                                                                </tr>
+                                                            {{end}}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </li>
+                                        {{end}}
+                                    </ul>
+                                </div>
+                            </div>
+                        {{else}}
+                            <div class="card">
+                                <div class="card-content">
+                                    <span class="card-title">{{$user.Name}}'s Exercise History</span>
+                                    <p>No exercise history available yet.</p>
+                                </div>
+                            </div>
+                        {{end}}
+                    {{end}}
+                </div>
+            </div>
+            
+            <!-- Activity Log -->
+            <div class="row">
+                <div class="col s12">
+                    <h3>Activity Log</h3>
+                    {{range .Users}}
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">{{.Name}}'s Activity</span>
+                            {{if .ActivityLog}}
+                            <ul class="collection">
+                                {{range .ActivityLog}}
+                                <li class="collection-item">{{.}}</li>
+                                {{end}}
+                            </ul>
+                            {{else}}
+                            <p>No activities logged yet.</p>
+                            {{end}}
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
